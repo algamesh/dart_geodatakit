@@ -1,0 +1,13 @@
+name: dart_geodatakit
+description: Geospatial Data Handler.
+version: 0.0.0
+# repository: https://github.com/algamesh/dart_geodatakit
+
+environment:
+  sdk: ^3.6.2
+
+dependencies:
+
+dev_dependencies:
+  lints: ^5.0.0
+  test: ^1.24.0
