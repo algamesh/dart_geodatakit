@@ -1,8 +1,9 @@
-/// Support for doing something awesome.
-///
-/// More dartdocs go here.
-library;
+library dart_geodatakit;
 
-export 'src/dart_geodatakit_base.dart';
-
-// TODO: Export any libraries intended for clients of this package.
+export 'src/geojson_handler.dart';
+export 'src/shapefile_handler.dart';
+// export 'src/geodatabase_handler.dart';
+export 'src/geopackage_handler.dart';
+export 'src/models/geo_feature.dart';
+export 'src/models/geo_geometry.dart';
+export 'src/models/wkt_handler.dart';
