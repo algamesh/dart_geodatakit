@@ -86,7 +86,7 @@ class ShapefileHandler {
 
     while (offset < bytes.length) {
       // Read record header
-      final recordNumber = byteData.getUint32(offset, Endian.big);
+      // final recordNumber = byteData.getUint32(offset, Endian.big);
       final contentLength = byteData.getUint32(offset + 4, Endian.big);
       offset += 8;
 
@@ -106,15 +106,15 @@ class ShapefileHandler {
           // Read bounding box
           offset += 32;
 
-          final numParts = byteData.getUint32(offset, Endian.little);
+          // final numParts = byteData.getUint32(offset, Endian.little);
           final numPoints = byteData.getUint32(offset + 4, Endian.little);
           offset += 8;
 
           // Read parts
-          final parts = List<int>.generate(numParts, (i) {
-            return byteData.getUint32(offset + (i * 4), Endian.little);
-          });
-          offset += numParts * 4;
+          // final parts = List<int>.generate(numParts, (i) {
+          //   return byteData.getUint32(offset + (i * 4), Endian.little);
+          // });
+          // offset += numParts * 4;
 
           // Read points
           final points = List<LatLng>.generate(numPoints, (i) {
@@ -146,7 +146,7 @@ class ShapefileHandler {
     // Parse DBF header
     final numRecords = byteData.getUint32(4, Endian.little);
     final headerLength = byteData.getUint16(8, Endian.little);
-    final recordLength = byteData.getUint16(10, Endian.little);
+    // final recordLength = byteData.getUint16(10, Endian.little);
 
     // Parse field descriptors
     final fields = <String>[];
@@ -187,7 +187,7 @@ class ShapefileHandler {
     final dbfBytes = _createDbfFile();
     await dbfFile.writeAsBytes(dbfBytes);
   }
-  
+
   Uint8List _createShpFile() {
     final bytesBuilder = BytesBuilder();
 
@@ -227,7 +227,8 @@ class ShapefileHandler {
     }
 
     // Update file length in header
-    final totalLength = bytesBuilder.length ~/ 2; // Corrected from lengthInBytes
+    final totalLength =
+        bytesBuilder.length ~/ 2; // Corrected from lengthInBytes
     final allBytes = bytesBuilder.toBytes();
     final headerBytes = allBytes.sublist(0, 100);
     final headerData = ByteData.sublistView(headerBytes);

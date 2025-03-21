@@ -86,11 +86,12 @@ class GeoPackageHandler {
     offset += 2;
 
     if (magic != 0x4750) {
-      throw Exception('Invalid GeoPackage geometry blob (magic number mismatch)');
+      throw Exception(
+          'Invalid GeoPackage geometry blob (magic number mismatch)');
     }
 
     // Read version (1 byte)
-    final version = byteData.getUint8(offset);
+    // final version = byteData.getUint8(offset);
     offset += 1;
 
     // Read flags (1 byte)
@@ -103,7 +104,7 @@ class GeoPackageHandler {
     final hasM = (flags & 0x20) != 0;
 
     // Read SRS ID (4 bytes)
-    final srsId = byteData.getInt32(offset, Endian.little);
+    // final srsId = byteData.getInt32(offset, Endian.little);
     offset += 4;
 
     // Read envelope (optional)
@@ -136,7 +137,8 @@ class GeoPackageHandler {
     return _parseWKBGeometry(wkbBytes, hasZ: hasZ, hasM: hasM);
   }
 
-  GeoGeometry _parseWKBGeometry(Uint8List wkbBytes, {bool hasZ = false, bool hasM = false}) {
+  GeoGeometry _parseWKBGeometry(Uint8List wkbBytes,
+      {bool hasZ = false, bool hasM = false}) {
     final byteData = ByteData.sublistView(wkbBytes);
     int offset = 0;
 
@@ -156,24 +158,31 @@ class GeoPackageHandler {
     // Handle different geometry types
     switch (baseGeometryType) {
       case 1: // Point
-        return _parsePoint(byteData, offset, isLittleEndian, hasZ: hasZ, hasM: hasM);
+        return _parsePoint(byteData, offset, isLittleEndian,
+            hasZ: hasZ, hasM: hasM);
       case 2: // LineString
-        return _parseLineString(byteData, offset, isLittleEndian, hasZ: hasZ, hasM: hasM);
+        return _parseLineString(byteData, offset, isLittleEndian,
+            hasZ: hasZ, hasM: hasM);
       case 3: // Polygon
-        return _parsePolygon(byteData, offset, isLittleEndian, hasZ: hasZ, hasM: hasM);
+        return _parsePolygon(byteData, offset, isLittleEndian,
+            hasZ: hasZ, hasM: hasM);
       case 4: // MultiPoint
-        return _parseMultiPoint(byteData, offset, isLittleEndian, hasZ: hasZ, hasM: hasM);
+        return _parseMultiPoint(byteData, offset, isLittleEndian,
+            hasZ: hasZ, hasM: hasM);
       case 5: // MultiLineString
-        return _parseMultiLineString(byteData, offset, isLittleEndian, hasZ: hasZ, hasM: hasM);
+        return _parseMultiLineString(byteData, offset, isLittleEndian,
+            hasZ: hasZ, hasM: hasM);
       case 6: // MultiPolygon
-        return _parseMultiPolygon(byteData, offset, isLittleEndian, hasZ: hasZ, hasM: hasM);
+        return _parseMultiPolygon(byteData, offset, isLittleEndian,
+            hasZ: hasZ, hasM: hasM);
       default:
         throw Exception('Unsupported geometry type: $baseGeometryType');
     }
   }
 
   // Parse methods
-  GeoPoint _parsePoint(ByteData byteData, int offset, bool isLittleEndian, {bool hasZ = false, bool hasM = false}) {
+  GeoPoint _parsePoint(ByteData byteData, int offset, bool isLittleEndian,
+      {bool hasZ = false, bool hasM = false}) {
     final x = _getFloat64(byteData, offset, isLittleEndian);
     offset += 8;
     final y = _getFloat64(byteData, offset, isLittleEndian);
@@ -190,7 +199,9 @@ class GeoPackageHandler {
     return GeoPoint(LatLng(y, x));
   }
 
-  GeoLineString _parseLineString(ByteData byteData, int offset, bool isLittleEndian, {bool hasZ = false, bool hasM = false}) {
+  GeoLineString _parseLineString(
+      ByteData byteData, int offset, bool isLittleEndian,
+      {bool hasZ = false, bool hasM = false}) {
     final numPoints = _getUint32(byteData, offset, isLittleEndian);
     offset += 4;
 
@@ -216,7 +227,8 @@ class GeoPackageHandler {
     return GeoLineString(points);
   }
 
-  GeoPolygon _parsePolygon(ByteData byteData, int offset, bool isLittleEndian, {bool hasZ = false, bool hasM = false}) {
+  GeoPolygon _parsePolygon(ByteData byteData, int offset, bool isLittleEndian,
+      {bool hasZ = false, bool hasM = false}) {
     final numRings = _getUint32(byteData, offset, isLittleEndian);
     offset += 4;
 
@@ -247,7 +259,9 @@ class GeoPackageHandler {
     return GeoPolygon(points);
   }
 
-  GeoMultiPoint _parseMultiPoint(ByteData byteData, int offset, bool isLittleEndian, {bool hasZ = false, bool hasM = false}) {
+  GeoMultiPoint _parseMultiPoint(
+      ByteData byteData, int offset, bool isLittleEndian,
+      {bool hasZ = false, bool hasM = false}) {
     final numPoints = _getUint32(byteData, offset, isLittleEndian);
     offset += 4;
 
@@ -255,7 +269,10 @@ class GeoPackageHandler {
 
     for (int i = 0; i < numPoints; i++) {
       // Each point is a Point geometry with its own byte order and geometry type
-      final pointGeometry = _parseWKBGeometry(byteData.buffer.asUint8List(offset), hasZ: hasZ, hasM: hasM);
+      final pointGeometry = _parseWKBGeometry(
+          byteData.buffer.asUint8List(offset),
+          hasZ: hasZ,
+          hasM: hasM);
       if (pointGeometry is GeoPoint) {
         points.add(pointGeometry.point);
       }
@@ -266,14 +283,19 @@ class GeoPackageHandler {
     return GeoMultiPoint(points);
   }
 
-  GeoMultiLineString _parseMultiLineString(ByteData byteData, int offset, bool isLittleEndian, {bool hasZ = false, bool hasM = false}) {
+  GeoMultiLineString _parseMultiLineString(
+      ByteData byteData, int offset, bool isLittleEndian,
+      {bool hasZ = false, bool hasM = false}) {
     final numLineStrings = _getUint32(byteData, offset, isLittleEndian);
     offset += 4;
 
     final lineStrings = <List<LatLng>>[];
 
     for (int i = 0; i < numLineStrings; i++) {
-      final lineStringGeometry = _parseWKBGeometry(byteData.buffer.asUint8List(offset), hasZ: hasZ, hasM: hasM);
+      final lineStringGeometry = _parseWKBGeometry(
+          byteData.buffer.asUint8List(offset),
+          hasZ: hasZ,
+          hasM: hasM);
       if (lineStringGeometry is GeoLineString) {
         lineStrings.add(lineStringGeometry.points);
       }
@@ -286,14 +308,19 @@ class GeoPackageHandler {
     return GeoMultiLineString(lineStrings);
   }
 
-  GeoMultiPolygon _parseMultiPolygon(ByteData byteData, int offset, bool isLittleEndian, {bool hasZ = false, hasM = false}) {
+  GeoMultiPolygon _parseMultiPolygon(
+      ByteData byteData, int offset, bool isLittleEndian,
+      {bool hasZ = false, hasM = false}) {
     final numPolygons = _getUint32(byteData, offset, isLittleEndian);
     offset += 4;
 
     final polygons = <List<LatLng>>[];
 
     for (int i = 0; i < numPolygons; i++) {
-      final polygonGeometry = _parseWKBGeometry(byteData.buffer.asUint8List(offset), hasZ: hasZ, hasM: hasM);
+      final polygonGeometry = _parseWKBGeometry(
+          byteData.buffer.asUint8List(offset),
+          hasZ: hasZ,
+          hasM: hasM);
       if (polygonGeometry is GeoPolygon) {
         polygons.add(polygonGeometry.points);
       }
